@@ -1,6 +1,4 @@
 import numpy as np
-import cv2
-
 
 def img_guassian(image, mu, sigma):
     """

@@ -18,18 +18,10 @@ u = imp.img_normalization(img)
 # 梯度下降
 X = 2 * u
 lam = 1
-step = 0.01
-count = 1000
+count = 100
+initial_step = 1
 
-"""
-Calls the function obf.f with the given arguments.
 
-Args:
-    X: The input parameter to be passed to obf.f.
-
-Returns:
-    The result of calling obf.f with the given arguments.
-"""
 def f(X):
     return obf.f(X, u, lam)
 
@@ -38,7 +30,7 @@ def diff_f(X):
     return obf.diff_f(X, u, lam)
 
 
-X, loss, norm_gradient = gd.gd(f, diff_f, X, step, count)
+X, loss, norm_gradient = gd.gd_bb(f, diff_f, X, initial_step, count)
 
 X = imp.img_normalization(X)  # 归一化处理
 
@@ -57,7 +49,5 @@ plt.ylabel("norm of the gradient(log)")
 plt.show()
 
 # 显示图片结果
-cv2.imshow("step=0.01,lambda=1", X)
+cv2.imshow("BB_step", X)
 cv2.waitKey(0)
-
-

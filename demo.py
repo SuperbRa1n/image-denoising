@@ -1,18 +1,38 @@
 import numpy as np
-from scipy.signal import convolve2d
 
-# 创建一个示例矩阵
-matrix = np.array([[1, 2, 3,4],
-                  [4, 5, 6,9],
-                  [7, 8, 9,4]])
+# 定义优化问题的目标函数和梯度函数
+def objective_function(x):
+    return x[0]**2 + x[1]**2
 
-# 定义离散拉普拉斯算子
-laplacian_operator = np.array([[0, 1, 0],
-                              [1, -4, 1],
-                              [0, 1, 0]])
+def gradient_function(x):
+    return np.array([2 * x[0], 2 * x[1]])
 
-# 使用 convolve2d 函数计算矩阵的离散化二阶导数
-laplacian = convolve2d(matrix, laplacian_operator, mode='same', boundary='wrap')
+# 初始化参数和BB步长所需的变量
+x = np.array([2.0, 3.0])  # 初始参数
+max_iterations = 100  # 最大迭代次数
+tolerance = 1e-6  # 收敛容忍度
 
-print("矩阵的离散化二阶导数 (拉普拉斯结果):")
-print(laplacian)
+x_prev = x.copy()
+gradient_prev = gradient_function(x)  # 初始梯度
+
+# 迭代优化过程
+for iteration in range(max_iterations):
+    gradient = gradient_function(x)  # 计算当前参数处的梯度
+    if iteration > 0:
+        s_k = x - x_prev
+        y_k = gradient - gradient_prev
+        step_length = np.dot(s_k, s_k) / np.dot(s_k, y_k)
+    else:
+        step_length = 1000  # 初始步长
+    
+    x_prev = x.copy()
+    gradient_prev = gradient.copy()
+    
+    x = x - step_length * gradient  # 更新参数
+    
+    print(f"第{iteration}步:loss={objective_function(x)}")
+    if np.linalg.norm(gradient) < tolerance:
+        break
+
+print("Optimal solution:", x)
+print("Optimal value:", objective_function(x))

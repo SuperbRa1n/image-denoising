@@ -1,5 +1,4 @@
 import numpy as np
-import cv2
 
 def psnr(image1, image2, maxPixelValue):
     """
@@ -16,3 +15,4 @@ def psnr(image1, image2, maxPixelValue):
     mse = np.mean(np.square((image1[:] - image2[:])))
     psnrValue = 10 * np.log10((maxPixelValue ** 2) / mse)
     return psnrValue
+
