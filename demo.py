@@ -43,7 +43,7 @@ loss_history = []
 grad_norm_history = []
 
 # 训练神经网络
-for epoch in range(1000):
+for epoch in range(1000):  # 1000步训练
     # 前向传播
     hidden_layer_input = np.dot(Y, weights_input_hidden) + bias_input_hidden
     hidden_layer_output = relu(hidden_layer_input)
@@ -55,9 +55,6 @@ for epoch in range(1000):
     total_loss = 0.5 * np.linalg.norm(Y - O * predicted_output) ** 2 + lambda_value * regularization_term
     loss_history.append(total_loss)
 
-    # 打印loss value
-    print(f'第{epoch}步:loss={total_loss}')
-    
     # 反向传播
     error = O * predicted_output * (1 - predicted_output)
     d_output = error * sigmoid_derivative(predicted_output)
@@ -65,15 +62,18 @@ for epoch in range(1000):
     d_hidden = error_hidden * relu_derivative(hidden_layer_output)
 
     # 更新权重和偏置
-    weights_hidden_output += learning_rate * hidden_layer_output.T.dot(d_output)
-    bias_hidden_output += learning_rate * np.sum(d_output, axis=0, keepdims=True)
-    weights_input_hidden += learning_rate * Y.T.dot(d_hidden)
-    bias_input_hidden += learning_rate * np.sum(d_hidden, axis=0, keepdims=True)
+    weights_hidden_output -= learning_rate * hidden_layer_output.T.dot(d_output)
+    bias_hidden_output -= learning_rate * np.sum(d_output, axis=0, keepdims=True)
+    weights_input_hidden -= learning_rate * Y.T.dot(d_hidden)
+    bias_input_hidden -= learning_rate * np.sum(d_hidden, axis=0, keepdims=True)
 
     # 计算梯度范数
     grad_norm = np.linalg.norm(np.concatenate([weights_hidden_output.flatten(), bias_hidden_output.flatten(),
                                                weights_input_hidden.flatten(), bias_input_hidden.flatten()]))
     grad_norm_history.append(grad_norm)
+
+    # 逐步减小学习率
+    learning_rate *= 0.99
 
 # 绘制损失函数和梯度范数的图像
 plt.figure(figsize=(12, 5))
@@ -93,3 +93,29 @@ plt.ylabel('Norm of Gradients')
 plt.legend()
 
 plt.show()
+
+# 显示原始图像和加入噪声的图像
+plt.figure(figsize=(12, 6))
+
+plt.subplot(1, 3, 1)
+plt.imshow(u.reshape(img.shape), cmap='gray')
+plt.title('Original Image')
+
+plt.subplot(1, 3, 2)
+plt.imshow(img, cmap='gray')
+plt.title('Noisy Image')
+
+# 将预测输出转为0-255的灰度图像
+reconstructed_image = (predicted_output * 255).astype(np.uint8)
+plt.subplot(1, 3, 3)
+plt.imshow(reconstructed_image.reshape(img.shape), cmap='gray')
+plt.title('Reconstructed Image')
+
+# 在cv2中显示图像
+cv2.imshow('Original Image', (u.reshape(img.shape) * 255).astype(np.uint8))
+cv2.imshow('Noisy Image', img.astype(np.uint8))
+cv2.imshow('Reconstructed Image', reconstructed_image.reshape(img.shape))
+
+# 等待按键关闭窗口
+cv2.waitKey(0)
+cv2.destroyAllWindows()
