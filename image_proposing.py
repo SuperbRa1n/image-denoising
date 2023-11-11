@@ -1,6 +1,7 @@
 import numpy as np
-
-def img_guassian(image, mu, sigma):
+import cv2
+import cv2.typing
+def img_guassian(image:cv2.typing.MatLike, mu, sigma) -> cv2.typing.MatLike:
     """
     Add Gaussian noise to the input image.
 
@@ -16,7 +17,7 @@ def img_guassian(image, mu, sigma):
 
 
 # 归一化处理
-def img_normalization(img):
+def img_normalization(img:cv2.typing.MatLike) -> cv2.typing.MatLike:
     """
     Normalize the input image by scaling its pixel values between 0 and 1.
 
