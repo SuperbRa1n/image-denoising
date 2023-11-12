@@ -7,16 +7,16 @@ import gradient_descent as gd
 import image_proposing as imp
 
 # 导入图片
-img = cv2.imread('./image.png',cv2.IMREAD_GRAYSCALE)
-
+img_initial = cv2.imread('./image.png',cv2.IMREAD_GRAYSCALE)
 # 向图片加入高斯噪声
-img = imp.img_guassian(img, 0, 20)
+img = imp.img_guassian(img_initial)
 
 # 归一化处理
+img_initial = imp.img_normalization(img_initial)
 u = imp.img_normalization(img)
 
 # 梯度下降
-X = 2*u
+X = np.ones_like(img)
 lam = 1
 step = 0.01
 count = 1000
@@ -26,12 +26,11 @@ def f(X):
 def diff_f(X):
     return obf.diff_f(X, u, lam)
 
-X,loss,norm_gradient = gd.gd(f,diff_f,X,step,count)
+X,loss,norm_gradient, psnr = gd.gd(f,diff_f,X,step,count)
 
 X = imp.img_normalization(X) # 归一化处理
 
-# 输出psnr
-print(ev.psnr(X, u, 1))
+print(ev.psnr(X, img_initial, 255))
 
 # 绘制图像
 plt.figure(1)
@@ -42,8 +41,12 @@ plt.figure(2)
 plt.plot(range(count),np.log10(norm_gradient))
 plt.xlabel('Iteration')
 plt.ylabel('norm of the gradient(log)')
+plt.figure(3)
+plt.plot(range(count), psnr)
+plt.xlabel('Iteration')
+plt.ylabel('psnr')
 plt.show()
 
 # 显示图片结果
-cv2.imshow('step=0.01,lambda=1',X)
+cv2.imshow('step=0.01,lambda=0.1',X)
 cv2.waitKey(0)

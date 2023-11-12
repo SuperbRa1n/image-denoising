@@ -16,13 +16,14 @@ img_initial = imp.img_normalization(img_initial)
 
 # 归一化处理
 u = imp.img_normalization(img)
-
-
+print(ev.psnr(u, ev.img_initial, 255))
 # 梯度下降
 X = np.ones_like(img) * np.random.rand()
 lam = 1
-count = 100
-initial_step = 1
+count = 200
+beta1 = 0.9
+beta2 = 0.999
+epsilon = 1e-8
 
 
 def f(X):
@@ -33,11 +34,11 @@ def diff_f(X):
     return obf.diff_f(X, u, lam)
 
 
-X, loss, norm_gradient, psnr = gd.gd_bb(f, diff_f, X, initial_step, count)
+X, loss, norm_gradient, psnr = gd.gd_adam(f, diff_f, X, beta1, beta2, epsilon, count)
 
 X = imp.img_normalization(X)  # 归一化处理
 
-print(ev.psnr(X, u, 255))
+print(ev.psnr(X, img_initial, 255))
 
 # 绘制图像
 plt.figure(1)
@@ -55,5 +56,5 @@ plt.ylabel('psnr')
 plt.show()
 
 # 显示图片结果
-cv2.imshow("BB_step", X)
+cv2.imshow("Adam_step", X)
 cv2.waitKey(0)
