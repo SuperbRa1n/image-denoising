@@ -1,1 +1,0 @@
-X = np.ones_like(img) * np.random.rand()
